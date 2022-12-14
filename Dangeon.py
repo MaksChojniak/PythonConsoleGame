@@ -1,9 +1,24 @@
+from copy import copy
 import random, msvcrt, os
 
+ataki = {
+     "lewy_prosty" : random.randint(10, 20),
+     "noz" : random.randint(20, 30),
+     "olweanie" : random.randint(30, 40),
+     "pistolet" : random.randint(50, 60)
+}
+przeciwnicy = {
+    1:[random.randint(5, 8), random.randint(40, 45)],
+    2:[random.randint(8, 12), random.randint(45, 50)],
+    3:[random.randint(12, 16), random.randint(50, 55)],
+    4:[random.randint(16, 20), random.randint(55, 60)],
+    5:[random.randint(20, 22), random.randint(60, 85)]
+    }
+nazwy_przeciwnikow = ["Gora", "NPC", "Shrek", "PrzeciwnikNPC", "ENEMY"]
 
 punkty = 0
 poziom = 0
-punkty_zycia = 100
+punkty_zycia = 150
 walka = False
 
 
@@ -120,15 +135,24 @@ def input_system():
     inp = msvcrt.getwch()
     inp = str(inp.lower())
 
-
     if inp == "w":
         return 0
-    if inp == "s":
+    elif inp == "s":
         return 1
-    if inp == "a":
+    elif inp == "a":
         return 2
-    if inp == "d":
+    elif inp == "d":
         return 3
+
+    elif inp == "1":
+        return 4
+    elif inp == "2":
+        return 5
+    elif inp == "3":
+        return 6
+    elif inp == "4":
+        return 7
+
     else:
         return -1
 
@@ -166,8 +190,7 @@ def movement_system():
 
     
 def player_movement(map_table):
-
-    global punkty
+    global punkty_zycia
     global poziom
     global walka
 
@@ -188,18 +211,21 @@ def player_movement(map_table):
         player_pos[1] += xz_axis[0]
 
     if map_table[player_pos[0]][player_pos[1]] == 5:
-        poziom = poziom + 1
+        punkty_zycia += 20
+        poziom += 1
+
 
     if map_table[player_pos[0]][player_pos[1]] != 1 and map_table[player_pos[0]][player_pos[1]] != 7:
         map_table[before_player_pos[0]][before_player_pos[1]] = 0
         map_table[player_pos[0]][player_pos[1]] = 8
 
     if map_table[player_pos[0]][player_pos[1]] == 7:
-        player_pos = before_player_pos
+        map_table[before_player_pos[0]][before_player_pos[1]] = 0
+        map_table[player_pos[0]][player_pos[1]] = 8
         walka = True
 
 
-    punkty = punkty + 1
+
 
     os.system('cls')
     print(legend())
@@ -207,21 +233,60 @@ def player_movement(map_table):
     return poziom
 
 
+def fighting_system():
+    inp = input_system() - 3
+    print(inp)
+    if inp == 1:
+        return ataki["lewy_prosty"]
+    # elif inp == 2:
+    #    return ataki[1][1]
+    # elif inp == 3:
+    #     return ataki[2][1]
+    #elif inp == 4:
+    #    return ataki[3][1]
+    else:
+        return fighting_system()
+
 
 def display_fight_scene():
+    global punkty
     global walka
+    global punkty_zycia
+    global nazwy_przeciwnikow
+    
+    przeciwnik = przeciwnicy[random.randint(1, 5)].copy()
+    nazwa_przeciwnika = nazwy_przeciwnikow[random.randint(0, 4)]
 
-    print("To Jest Walk z Trolem \n Elo Jesetm Zenek Nie Zabijesz mnie ahhaha \n gess  \n gergeg \n regergeg")
+    print("Walczysz z " + nazwa_przeciwnika + " ktory ma " + str(przeciwnik[1]) + " hp. Toje zycie wynosi " + str(punkty_zycia) + " hp")
 
-    xz_axis = movement_system()
+    while przeciwnik[1] > 0:
+        print("\nKtory atak wybierasz ?\n 1. lewy prosty \n 2.  \n 3.  \n 4.  \n")
+        atak = fighting_system()
+        os.system('cls')
 
+        przeciwnik[1] -= atak
+        if przeciwnik[1] <= 0:
+            break
+        print( "\nZadales " + str(atak) + " obrazen przeciwnikowi, zostalo mu " + str(przeciwnik[1]) + " hp")
+        atak_przeciwnika = przeciwnik[0]
+        punkty_zycia -= atak_przeciwnika
+        print("\n"+ nazwa_przeciwnika + " zadał ci " + str(atak_przeciwnika) + " obrazen twoje zycie wynosi " + str(punkty_zycia) + " hp")
+
+        if punkty_zycia <= 0:
+            print("Przegrales przeciwnikowi zostalo " + str(przeciwnik[1]) + " hp")
+            return 1
+
+    print("Brawo wygrales z " + nazwa_przeciwnika + "\n Zostalo ci " + str(punkty_zycia) + " hp")
+    punkty = punkty + 1
+    return 2
+    
 
 
 def fight_with_enemy(map_table):
     global walka
 
     os.system('cls')
-    display_fight_scene()
+    fight = display_fight_scene()
 
     walka = False
 
@@ -239,20 +304,24 @@ def update():
 
     global poziom
     global walka
+    global punkty_zycia
+    global punkty
 
     print(legend())
     map_table = generate_map()
-    while True:
-        if walka == True:
-            #os.system('cls')
-            fight_with_enemy(map_table)
-
+    while punkty_zycia > 0:
         if poziom != player_movement(map_table):
             os.system('cls')
             print(legend())
             map_table = generate_map()
 
+        if walka == True:
+            fight_with_enemy(map_table)
+            if punkty_zycia <= 0:
+                break
 
+    os.system('cls')
+    print("przegrales. Twoje staytstki : \n poziom -> " + str(poziom) + "\n punkty -> " + str(punkty) + "\n punkty zycia -> " + str(punkty_zycia) + " hp")
 
 
 update()
