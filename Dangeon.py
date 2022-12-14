@@ -3,8 +3,8 @@ import random, msvcrt, os
 
 ataki = {
      "lewy_prosty" : random.randint(10, 20),
-     "noz" : random.randint(20, 30),
-     "olweanie" : random.randint(30, 40),
+     "miecz" : random.randint(20, 30),
+     "dotyk_proboszcza" : random.randint(30, 40),
      "pistolet" : random.randint(50, 60)
 }
 przeciwnicy = {
@@ -14,7 +14,7 @@ przeciwnicy = {
     4:[random.randint(16, 20), random.randint(55, 60)],
     5:[random.randint(20, 22), random.randint(60, 85)]
     }
-nazwy_przeciwnikow = ["Gora", "NPC", "Shrek", "PrzeciwnikNPC", "ENEMY"]
+nazwy_przeciwnikow = ["Gora", "NPC", "Shrek", "Stasiek", "Maras"]
 
 punkty = 0
 poziom = 0
@@ -22,7 +22,6 @@ punkty_zycia = 150
 walka = False
 
 
-# wypisz legende
 def legend():
 
     global punkty
@@ -33,10 +32,7 @@ def legend():
     return text
 
 
-    # enemy tag = "☺"
 
-
-# przetlumacz z liczb na stringa
 def spawn_objects_in_map(string1, value, string2):
     string_value = ""
     if value == 8:
@@ -53,7 +49,6 @@ def spawn_objects_in_map(string1, value, string2):
     return string1 + string_value + string2
 
 
-# generuj siatke gry
 def generate_grid(tab):
     grid_string = ""
     
@@ -80,7 +75,6 @@ def generate_grid(tab):
     return grid_string
 
 
-# generuje liste z wartosciami odopwiednimi dla danego przedmiotu
 def generate_map_list(rozmiar, iloszScian, iloscPrzeciwnikow):
     map_table = []
 
@@ -90,11 +84,9 @@ def generate_map_list(rozmiar, iloszScian, iloscPrzeciwnikow):
                 map_table[i].append(0)
         
 
-    # generuj pozycje gracza
     player_pos = [0, random.randint(0, rozmiar[1] - 1)]
     map_table[ player_pos[0] ] [ player_pos[1] ] = 8
 
-    # generuj pozycje scian (iloscScian => ilosc generowanych scian)
     for i in range(iloszScian):
         wall_pos = [ random.randint( 1, rozmiar[0] - 2 ), random.randint( 0, rozmiar[1] - 1 ) ]
         map_table[ wall_pos[0] ] [ wall_pos[1] ] = 1
@@ -106,18 +98,15 @@ def generate_map_list(rozmiar, iloszScian, iloscPrzeciwnikow):
             enemy_pos = [ y, x ]
             map_table[ enemy_pos[0] ] [ enemy_pos[1] ] = 7
     
-    # generuj pozycje portalu
     portal_pos = [ rozmiar[0] - 1,  random.randint( 0, rozmiar[1] - 1 ) ]
     map_table[ portal_pos[0] ] [ portal_pos[1] ] = 5
 
-    #wyswietl mape
     print(generate_grid(map_table))
 
     return map_table
 
 
 
-# generuj mape zaleznie od poziomu
 def generate_map():
     global poziom
 
@@ -130,7 +119,6 @@ def generate_map():
 
 
 
-# nasluchiwanie przycisku w, a, s, d
 def input_system():
     inp = msvcrt.getwch()
     inp = str(inp.lower())
@@ -156,7 +144,6 @@ def input_system():
     else:
         return -1
 
-# dodanie kierunkow poruszania sie po x, z
 def movement_system():
     x_axis = 0
     z_axis = 0
@@ -238,12 +225,12 @@ def fighting_system():
     print(inp)
     if inp == 1:
         return ataki["lewy_prosty"]
-    # elif inp == 2:
-    #    return ataki[1][1]
-    # elif inp == 3:
-    #     return ataki[2][1]
-    #elif inp == 4:
-    #    return ataki[3][1]
+    elif inp == 2:
+       return ataki["miecz"]
+    elif inp == 3:
+        return ataki["dotyk_proboszcza"]
+    elif inp == 4:
+       return ataki["pistolet"]
     else:
         return fighting_system()
 
